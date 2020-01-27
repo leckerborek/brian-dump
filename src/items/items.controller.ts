@@ -1,18 +1,24 @@
-import { Controller, Get, Req, Res, Post, Body } from '@nestjs/common';
+import { Controller, Get, Req, Res, Post, Body, Query } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { CreateItemDto } from './item';
-import { ItemsService } from 'src/items.service';
-import { WebContent } from './webContent';
+import { ItemsService } from './items.service';
+import { WebContent } from '../models/webContent';
+import { SearchService } from 'src/search/search.service';
+import { SearchResult } from 'src/models/searchResult';
 
 @Controller('items')
 export class ItemsController {
-    constructor(private readonly itemsService: ItemsService) {}
+    constructor(private readonly itemsService: ItemsService, private readonly searchService: SearchService) {}
 
     @Get()
-    findAll(): string {
-        //findAll(@Req() req: Request, @Res() res: Response) {
-        //console.log(req.url);
-        return 'this will return everything!';
+    async find(@Query() query: string): Promise<SearchResult[]> {
+        const results = await this.searchService.search(query);
+        return results;
+    }
+
+    @Get()
+    async find2(): Promise<string> {
+        return 'find2 will return everything!';
     }
 
     @Post()

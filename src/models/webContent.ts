@@ -6,4 +6,5 @@ export class WebContent {
     length: string;
     byline: string;
     uri: string;
+    origin: string;
 }
