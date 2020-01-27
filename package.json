@@ -23,7 +23,12 @@
     "@nestjs/common": "^6.10.14",
     "@nestjs/core": "^6.10.14",
     "@nestjs/platform-express": "^6.10.14",
+    "@types/request": "^2.48.4",
+    "jsdom": "^7.2.2",
+    "readability-node": "^0.1.0",
     "reflect-metadata": "^0.1.13",
+    "request": "^2.83.0",
+    "request-promise-native": "^1.0.8",
     "rimraf": "^3.0.0",
     "rxjs": "^6.5.4"
   },
