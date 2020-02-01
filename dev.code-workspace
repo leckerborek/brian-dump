@@ -1,0 +1,11 @@
+{
+  "folders": [
+	{
+		"path": "src/webclient"
+	},
+	{
+		"path": "src/service"
+	}
+],
+  "settings": {}
+}
