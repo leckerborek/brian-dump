@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as request from 'request-promise-native';
 import * as readability from 'readability-node';
 import * as jsdom from 'jsdom';
@@ -11,12 +11,12 @@ export class IndexService {
     constructor(private readonly searchService: SearchService) {}
 
     async extract(url: string): Promise<boolean> {
-        console.log('url', url);
+        Logger.log(`Starting extraction from '${url}'`);
         try {
             // Maybe try this axios thing... :shrug:
             let body = await request.get(url);
 
-            if (Verbose) console.log('body', body);
+            //if (Verbose) Logger.debug('body', body);
 
             let doc = jsdom.jsdom(body, {
                 features: {
@@ -25,8 +25,6 @@ export class IndexService {
                 }
             });
 
-            //if (Verbose) console.log('doc', doc);
-
             const Readability = readability.Readability;
             var article = new Readability({}, doc).parse();
 
@@ -34,7 +32,7 @@ export class IndexService {
                 throw new Error('Readability could not parse url.');
             }
 
-            if (Verbose) console.log('article', article);
+            //if (Verbose) Logger.debug('article', article);
 
             const webContent = {
                 origin: url,
@@ -47,13 +45,13 @@ export class IndexService {
                 uri: article.uri
             };
 
-            if (Verbose) console.log('webContent', webContent);
+            //if (Verbose) Logger.debug('webContent', webContent);
 
             this.searchService.index(webContent);
 
             return true;
         } catch (error) {
-            console.error(error);
+            Logger.error(error);
             return false;
         }
     }

@@ -14,10 +14,14 @@ export class SearchService {
         private readonly configService: ConfigService
     ) {
         this.indexName = configService.get<string>('ELASTICSEARCH_INDEX');
-        Logger.log(`Using ES index ${this.indexName}`);
+        Logger.log(`Using ES index '${this.indexName}'`);
     }
 
     private indexName: string;
+
+    // async create() {
+    //     //this.elasticsearchService.create()
+    // }
 
     async index(content: WebContent) {
         const searchModel: SearchModel = {
@@ -25,6 +29,14 @@ export class SearchService {
             uid: Guid.raw(),
             created: new Date().toISOString()
         };
+
+        const exists = await this.exists(content.origin);
+        Logger.log(`exists = ${exists}`);
+
+        if (exists) {
+            Logger.warn(`Item with origin '${content.origin}' already exists.`)
+            return;
+        }
 
         Logger.debug(searchModel);
 
@@ -63,6 +75,25 @@ export class SearchService {
                 created: hit._source.created
             };
         });
+    }
+
+    async exists(origin: string) {
+        return false;
+        const params: RequestParams.Search = {
+            index: this.indexName,
+            body: {
+                query: {
+                    match: {
+                        origin: origin
+                    }
+                }
+            }
+        };
+
+        const result = await this.elasticsearchService.search(params);
+        Logger.debug(result);
+        const hits = <any[]>result.body.hits.hits;
+        return hits.length > 0;
     }
 
     async example() {
@@ -113,10 +144,10 @@ export class SearchService {
         this.elasticsearchService
             .search(params)
             .then((result: ApiResponse) => {
-                console.log(result.body.hits.hits);
+                Logger.log(result.body.hits.hits);
             })
             .catch((err: Error) => {
-                console.log(err);
+                Logger.error(err);
             });
     }
 }
