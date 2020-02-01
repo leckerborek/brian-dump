@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Client, ApiResponse, RequestParams } from '@elastic/elasticsearch';
 import { WebContent } from 'src/common/model/webContent';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
@@ -7,37 +7,38 @@ import { Guid } from 'guid-typescript';
 import { SearchModel } from 'src/common/model/searchModel';
 import { SearchResultBase } from 'src/common/model/searchResultBase';
 
-const indexName: string = 'brian';
-
 @Injectable()
 export class SearchService {
     constructor(
         private readonly elasticsearchService: ElasticsearchService,
         private readonly configService: ConfigService
     ) {
-        console.log('SearchService.configService = ' + this.configService);
+        this.indexName = configService.get<string>('ELASTICSEARCH_INDEX');
+        Logger.log(`Using ES index ${this.indexName}`);
     }
 
+    private indexName: string;
+
     async index(content: WebContent) {
-        const searchData: SearchModel = {
+        const searchModel: SearchModel = {
             ...content,
             uid: Guid.raw(),
             created: new Date().toISOString()
         };
 
-        console.log(searchData);
+        Logger.debug(searchModel);
 
-        const doc: RequestParams.Index = {
-            index: indexName,
-            body: searchData
+        const document: RequestParams.Index = {
+            index: this.indexName,
+            body: searchModel
         };
 
-        await this.elasticsearchService.index(doc);
+        await this.elasticsearchService.index(document);
     }
 
     async search(query: string): Promise<SearchResultBase[]> {
         const params: RequestParams.Search = {
-            index: indexName,
+            index: this.indexName,
             body: {
                 query: {
                     match: {
@@ -59,7 +60,7 @@ export class SearchService {
                 score: hit._score,
                 title: hit._source.title,
                 content: hit._source.excerpt,
-                created: hit._source.created,
+                created: hit._source.created
             };
         });
     }
