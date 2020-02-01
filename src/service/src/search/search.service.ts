@@ -4,24 +4,40 @@ import { Injectable } from '@nestjs/common';
 import { Client, ApiResponse, RequestParams } from '@elastic/elasticsearch';
 import { WebContent } from 'src/models/webContent';
 import { SearchResult } from 'src/models/searchResult';
+import { ElasticsearchService } from '@nestjs/elasticsearch';
+import { ConfigService } from '@nestjs/config';
 
-const IndexName: string = 'brian';
+const indexName: string = 'brian';
+
+const schema = {
+    index: indexName,
+}
+
+class foo {
+    index: string;
+    body: string;
+}
 
 @Injectable()
 export class SearchService {
-    private client = new Client({ node: 'http://localhost:9200' });
+    constructor(private readonly elasticsearchService: ElasticsearchService, private readonly configService: ConfigService) {
+        console.log("SearchService.configService = " + this.configService)
+    }
+
+    // private client = new Client({ node: 'http://localhost:9200' });
 
     async index(data: WebContent) {
         const doc: RequestParams.Index = {
-            index: IndexName,
+            index: indexName,
             body: data
         }
-        await this.client.index(doc);
+
+        await this.elasticsearchService.index(doc);
     }
 
     async search(query: string): Promise<SearchResult[]> {
         const params: RequestParams.Search = {
-            index: IndexName,
+            index: indexName,
             body: {
                 query: {
                     match: {
@@ -31,7 +47,8 @@ export class SearchService {
             }
         };
 
-        const result = await this.client.search(params);
+        // const result = await this.client.search(params);
+        const result = await this.elasticsearchService.search(params);
         console.log(result.body.hits.hits);
 
         const hits = (<any[]>result.body.hits.hits);
@@ -49,7 +66,7 @@ export class SearchService {
                 quote: 'Winter is coming.'
             }
         };
-        await this.client.index(doc1);
+        await this.elasticsearchService.index(doc1);
 
         const doc2: RequestParams.Index = {
             index: 'game-of-thrones',
@@ -58,7 +75,7 @@ export class SearchService {
                 quote: 'I am the blood of the dragon.'
             }
         };
-        await this.client.index(doc2);
+        await this.elasticsearchService.index(doc2);
 
         const doc3: RequestParams.Index = {
             index: 'game-of-thrones',
@@ -71,7 +88,7 @@ export class SearchService {
                 quote: 'A mind needs books like a sword needs a whetstone.'
             }
         };
-        await this.client.index(doc3);
+        await this.elasticsearchService.index(doc3);
 
         // Let's search!
         const params: RequestParams.Search = {
@@ -85,7 +102,7 @@ export class SearchService {
             }
         };
 
-        this.client
+        this.elasticsearchService
             .search(params)
             .then((result: ApiResponse) => {
                 console.log(result.body.hits.hits);
