@@ -1,0 +1,17 @@
+version: "3"
+services:
+  # service:
+  #   build: src/service/.
+  #   ports:
+  #     - "3000:3000"
+  webclient:
+    build: src/webclient/.
+    ports:
+      - "8080:8080"
+  elasticsearch:
+    image: "elasticsearch:7.5.2"
+    environment:
+      - "discovery.type=single-node"
+    ports:
+      - "9200:9200"
+      - "9300:9300"

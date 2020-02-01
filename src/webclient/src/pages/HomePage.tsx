@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import isUrl from "is-url";
+import FlipMove from "react-flip-move";
 import SortButton from "../components/SortButton";
 
 type Result = {
@@ -26,7 +27,7 @@ const HomePage = () => {
     score: true
   });
 
-  const sortResults = () => {
+  const sortResults = useCallback(() => {
     setSortedResults(
       results.sort((a, b) => {
         if (toggled.date) {
@@ -37,14 +38,18 @@ const HomePage = () => {
           }
         } else {
           if (a.score < b.score) {
-            return -1;
-          } else {
             return 1;
+          } else {
+            return -1;
           }
         }
       })
     );
-  };
+  }, [results, toggled]);
+
+  useEffect(() => {
+    sortResults();
+  }, [results, sortResults]);
 
   const handleToggledClicked = (button: string) => {
     if (button === "date" && toggled.date) {
@@ -56,8 +61,6 @@ const HomePage = () => {
     }
 
     setToggled(current => {
-      sortResults();
-
       return {
         date: !current.date,
         score: !current.score
@@ -104,7 +107,6 @@ const HomePage = () => {
         })
         .then(json => {
           setResults(json);
-          sortResults();
         })
         .catch(err => console.error(err));
     }
@@ -147,7 +149,7 @@ const HomePage = () => {
           Score
         </SortButton>
       </div>
-      <div className="flex flex-wrap justify-center">
+      <FlipMove className="flex flex-wrap justify-center">
         {sortedResults.length === 0 ? (
           <p>Search for something</p>
         ) : (
@@ -169,7 +171,7 @@ const HomePage = () => {
             </a>
           ))
         )}
-      </div>
+      </FlipMove>
     </div>
   );
 };
