@@ -1,13 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Client, ApiResponse, RequestParams } from '@elastic/elasticsearch';
 import { WebContent } from 'src/common/model/webContent';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { ConfigService } from '@nestjs/config';
 import { Guid } from 'guid-typescript';
 import { SearchModel } from 'src/common/model/searchModel';
-import { SearchResult } from 'src/common/model/searchResult';
-
-const indexName: string = 'brian';
+import { SearchResultBase } from 'src/common/model/searchResultBase';
 
 @Injectable()
 export class SearchService {
@@ -15,23 +13,32 @@ export class SearchService {
         private readonly elasticsearchService: ElasticsearchService,
         private readonly configService: ConfigService
     ) {
-        console.log('SearchService.configService = ' + this.configService);
+        this.indexName = configService.get<string>('ELASTICSEARCH_INDEX');
+        Logger.log(`Using ES index ${this.indexName}`);
     }
 
-    async index(data: WebContent) {
-        const searchData = { ...data, uid: Guid.raw() };
+    private indexName: string;
 
-        const doc: RequestParams.Index = {
-            index: indexName,
-            body: searchData
+    async index(content: WebContent) {
+        const searchModel: SearchModel = {
+            ...content,
+            uid: Guid.raw(),
+            created: new Date().toISOString()
         };
 
-        await this.elasticsearchService.index(doc);
+        Logger.debug(searchModel);
+
+        const document: RequestParams.Index = {
+            index: this.indexName,
+            body: searchModel
+        };
+
+        await this.elasticsearchService.index(document);
     }
 
-    async search(query: string): Promise<SearchResult[]> {
+    async search(query: string): Promise<SearchResultBase[]> {
         const params: RequestParams.Search = {
-            index: indexName,
+            index: this.indexName,
             body: {
                 query: {
                     match: {
@@ -43,7 +50,7 @@ export class SearchService {
 
         // const result = await this.client.search(params);
         const result = await this.elasticsearchService.search(params);
-        console.log(result.body.hits.hits);
+        //console.log(result.body.hits.hits);
 
         const hits = <any[]>result.body.hits.hits;
         return hits.map((hit) => {
@@ -53,6 +60,7 @@ export class SearchService {
                 score: hit._score,
                 title: hit._source.title,
                 content: hit._source.excerpt,
+                created: hit._source.created
             };
         });
     }

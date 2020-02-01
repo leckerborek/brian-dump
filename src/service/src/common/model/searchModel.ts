@@ -1,6 +1,6 @@
 import { WebContent } from "./webContent";
 
-export interface SearchModel extends WebContent {
+export type SearchModel = WebContent & {
     uid: string;
-    origin: string;
+    created: string;
 }

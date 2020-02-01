@@ -4,7 +4,7 @@ import * as readability from 'readability-node';
 import * as jsdom from 'jsdom';
 import { SearchService } from 'src/search/search.service';
 
-const Verbose: boolean = true;
+const Verbose: boolean = false;
 
 @Injectable()
 export class IndexService {

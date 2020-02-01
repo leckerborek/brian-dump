@@ -4,4 +4,5 @@ export interface SearchResponseDto {
     origin: string;
     title: string;
     content: string;
+    created: string;
 }
