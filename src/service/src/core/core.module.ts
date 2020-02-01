@@ -6,6 +6,7 @@ import { SearchService } from 'src/search/search.service';
 import { DebugController } from 'src/debug/debug.controller';
 import { ElasticsearchModule, ElasticsearchService } from '@nestjs/elasticsearch';
 import { ElasticsearchConfigService } from './ElasticsearchConfigService';
+import { SearchController } from 'src/search/search.controller';
 
 @Module({
     imports: [
@@ -14,7 +15,7 @@ import { ElasticsearchConfigService } from './ElasticsearchConfigService';
         }),
         ConfigModule.forRoot({ isGlobal: true })
     ],
-    controllers: [ ItemsController, DebugController ],
+    controllers: [ ItemsController, DebugController, SearchController ],
     providers: [ ItemsService, SearchService ]
 })
 export class CoreModule {}
