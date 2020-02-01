@@ -1,21 +1,22 @@
 import { Injectable } from '@nestjs/common';
-// import * as request from 'request';
 import * as request from 'request-promise-native';
 import * as readability from 'readability-node';
 import * as jsdom from 'jsdom';
-import { WebContent } from '../models/webContent';
 import { SearchService } from 'src/search/search.service';
 
+const Verbose: boolean = false;
+
 @Injectable()
-export class ItemsService {
+export class IndexService {
     constructor(private readonly searchService: SearchService) {}
 
-    async extract(url: string): Promise<WebContent> {
+    async extract(url: string): Promise<boolean> {
         console.log('url', url);
         try {
             // Maybe try this axios thing... :shrug:
             let body = await request.get(url);
-            //console.log('body', body);
+
+            if (Verbose) console.log('body', body);
 
             let doc = jsdom.jsdom(body, {
                 features: {
@@ -24,7 +25,7 @@ export class ItemsService {
                 }
             });
 
-            //console.log('doc', doc);
+            if (Verbose) console.log('doc', doc);
 
             const Readability = readability.Readability;
             var article = new Readability({}, doc).parse();
@@ -32,7 +33,8 @@ export class ItemsService {
             if (article == null) {
                 throw new Error('Readability could not parse url.');
             }
-            //console.log('article', article);
+
+            if (Verbose) console.log('article', article);
 
             const webContent = {
                 origin: url,
@@ -44,12 +46,15 @@ export class ItemsService {
                 byline: article.byline,
                 uri: article.uri
             };
-            //console.log("webContent", webContent);
+
+            if (Verbose) console.log('webContent', webContent);
 
             this.searchService.index(webContent);
-            return webContent;
+
+            return true;
         } catch (error) {
             console.error(error);
+            return false;
         }
     }
 }

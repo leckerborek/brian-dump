@@ -1,4 +1,4 @@
-export class WebContent {
+export interface WebContent {
     title: string;
     excerpt: string;
     author: string;

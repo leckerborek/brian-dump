@@ -1,4 +1,4 @@
-export class SearchResult {
+export interface SearchResult {
     score: number;
     url: string;
 }

@@ -1,36 +1,26 @@
-'use strict';
-
 import { Injectable } from '@nestjs/common';
 import { Client, ApiResponse, RequestParams } from '@elastic/elasticsearch';
 import { WebContent } from 'src/models/webContent';
-import { SearchResult } from 'src/models/searchResult';
+import { SearchResult } from 'src/search/models/searchResult';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { ConfigService } from '@nestjs/config';
 
 const indexName: string = 'brian';
 
-const schema = {
-    index: indexName,
-}
-
-class foo {
-    index: string;
-    body: string;
-}
-
 @Injectable()
 export class SearchService {
-    constructor(private readonly elasticsearchService: ElasticsearchService, private readonly configService: ConfigService) {
-        console.log("SearchService.configService = " + this.configService)
+    constructor(
+        private readonly elasticsearchService: ElasticsearchService,
+        private readonly configService: ConfigService
+    ) {
+        console.log('SearchService.configService = ' + this.configService);
     }
-
-    // private client = new Client({ node: 'http://localhost:9200' });
 
     async index(data: WebContent) {
         const doc: RequestParams.Index = {
             index: indexName,
             body: data
-        }
+        };
 
         await this.elasticsearchService.index(doc);
     }
@@ -51,10 +41,13 @@ export class SearchService {
         const result = await this.elasticsearchService.search(params);
         console.log(result.body.hits.hits);
 
-        const hits = (<any[]>result.body.hits.hits);
-        return hits.map(hit => { return {
-            score: hit._score,
-            url: hit._source.origin }});
+        const hits = <any[]>result.body.hits.hits;
+        return hits.map((hit) => {
+            return {
+                score: hit._score,
+                url: hit._source.origin
+            };
+        });
     }
 
     async example() {
