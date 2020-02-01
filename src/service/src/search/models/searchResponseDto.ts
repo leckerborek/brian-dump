@@ -1,6 +1,7 @@
 export interface SearchResponseDto {
+    uid: string,
     score: number;
-    title: string;
     origin: string;
+    title: string;
     content: string;
 }

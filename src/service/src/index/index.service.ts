@@ -4,7 +4,7 @@ import * as readability from 'readability-node';
 import * as jsdom from 'jsdom';
 import { SearchService } from 'src/search/search.service';
 
-const Verbose: boolean = false;
+const Verbose: boolean = true;
 
 @Injectable()
 export class IndexService {
@@ -25,7 +25,7 @@ export class IndexService {
                 }
             });
 
-            if (Verbose) console.log('doc', doc);
+            //if (Verbose) console.log('doc', doc);
 
             const Readability = readability.Readability;
             var article = new Readability({}, doc).parse();

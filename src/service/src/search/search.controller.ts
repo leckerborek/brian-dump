@@ -13,10 +13,11 @@ export class SearchController {
 
         const result = searchResult.map((result) => {
             return {
-                title: result.url,
-                content: result.url,
+                uid:  result.uid,
+                title: result.title,
+                content: result.content,
                 score: result.score,
-                origin: result.url,
+                origin: result.origin,
             };
         });
 

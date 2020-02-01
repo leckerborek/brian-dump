@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Client, ApiResponse, RequestParams } from '@elastic/elasticsearch';
-import { WebContent } from 'src/models/webContent';
-import { SearchResult } from 'src/search/models/searchResult';
+import { WebContent } from 'src/common/model/webContent';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { ConfigService } from '@nestjs/config';
+import { Guid } from 'guid-typescript';
+import { SearchModel } from 'src/common/model/searchModel';
+import { SearchResult } from 'src/common/model/searchResult';
 
 const indexName: string = 'brian';
 
@@ -17,9 +19,11 @@ export class SearchService {
     }
 
     async index(data: WebContent) {
+        const searchData = { ...data, uid: Guid.raw() };
+
         const doc: RequestParams.Index = {
             index: indexName,
-            body: data
+            body: searchData
         };
 
         await this.elasticsearchService.index(doc);
@@ -44,8 +48,11 @@ export class SearchService {
         const hits = <any[]>result.body.hits.hits;
         return hits.map((hit) => {
             return {
+                uid: hit._source.uid,
+                origin: hit._source.origin,
                 score: hit._score,
-                url: hit._source.origin
+                title: hit._source.title,
+                content: hit._source.excerpt,
             };
         });
     }
