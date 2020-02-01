@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import isUrl from "is-url";
+import FlipMove from "react-flip-move";
+import SortButton from "../components/SortButton";
 
 type Result = {
   uid: string;
@@ -7,12 +9,64 @@ type Result = {
   title: string;
   score: number;
   origin: string;
+  created: string;
+};
+
+export type Toggled = {
+  date: boolean;
+  score: boolean;
 };
 
 const HomePage = () => {
   const [url, setUrl] = useState("");
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<Result[]>([]);
+  const [sortedResults, setSortedResults] = useState<Result[]>([]);
+  const [toggled, setToggled] = useState<Toggled>({
+    date: false,
+    score: true
+  });
+
+  const sortResults = useCallback(() => {
+    setSortedResults(
+      results.sort((a, b) => {
+        if (toggled.date) {
+          if (new Date(a.created) < new Date(b.created)) {
+            return -1;
+          } else {
+            return 1;
+          }
+        } else {
+          if (a.score < b.score) {
+            return 1;
+          } else {
+            return -1;
+          }
+        }
+      })
+    );
+  }, [results, toggled]);
+
+  useEffect(() => {
+    sortResults();
+  }, [results, sortResults]);
+
+  const handleToggledClicked = (button: string) => {
+    if (button === "date" && toggled.date) {
+      return;
+    }
+
+    if (button === "score" && toggled.score) {
+      return;
+    }
+
+    setToggled(current => {
+      return {
+        date: !current.date,
+        score: !current.score
+      };
+    });
+  };
 
   const handleUrlKeyDown = (ev: React.KeyboardEvent) => {
     if (ev.key === "Enter") {
@@ -78,12 +132,28 @@ const HomePage = () => {
         onKeyDown={handleSearchKeyDown}
       />
 
-      <h2 className="my-4 text-2xl font-bold">Results</h2>
-      <div className="flex flex-wrap justify-center">
-        {results.length === 0 ? (
+      <h2 className="mt-4 text-2xl font-bold">Results</h2>
+      <div className="flex mt-2 mb-2">
+        <SortButton
+          type="date"
+          toggled={toggled}
+          handleToggledClicked={handleToggledClicked}
+        >
+          Date
+        </SortButton>
+        <SortButton
+          type="score"
+          toggled={toggled}
+          handleToggledClicked={handleToggledClicked}
+        >
+          Score
+        </SortButton>
+      </div>
+      <FlipMove className="flex flex-wrap justify-center">
+        {sortedResults.length === 0 ? (
           <p>Search for something</p>
         ) : (
-          results.map(result => (
+          sortedResults.map(result => (
             <a
               href={result.origin}
               target="_blank"
@@ -101,7 +171,7 @@ const HomePage = () => {
             </a>
           ))
         )}
-      </div>
+      </FlipMove>
     </div>
   );
 };
