@@ -1,9 +1,11 @@
 version: "3"
 services:
-  # service:
-  #   build: src/service/.
-  #   ports:
-  #     - "3000:3000"
+  service:
+    build: src/service/.
+    environment:
+      - ELASTICSEARCH_NODE=http://elasticsearch:9200
+    ports:
+      - "3000:3000"
   webclient:
     build: src/webclient/.
     ports:
