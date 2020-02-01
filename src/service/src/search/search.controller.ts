@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
-import { SearchRequest } from '../../../shared/model/searchRequest';
-import { SearchResponse } from '../../../shared/model/searchResponse';
+import { SearchRequest } from 'src/models/searchRequest';
+import { SearchResponse } from 'src/models/searchResponse';
 
 @Controller('search')
 export class SearchController {
