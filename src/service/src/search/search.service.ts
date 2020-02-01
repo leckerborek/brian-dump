@@ -5,7 +5,7 @@ import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { ConfigService } from '@nestjs/config';
 import { Guid } from 'guid-typescript';
 import { SearchModel } from 'src/common/model/searchModel';
-import { SearchResult } from 'src/common/model/searchResult';
+import { SearchResultBase } from 'src/common/model/searchResultBase';
 
 const indexName: string = 'brian';
 
@@ -18,8 +18,14 @@ export class SearchService {
         console.log('SearchService.configService = ' + this.configService);
     }
 
-    async index(data: WebContent) {
-        const searchData = { ...data, uid: Guid.raw() };
+    async index(content: WebContent) {
+        const searchData: SearchModel = {
+            ...content,
+            uid: Guid.raw(),
+            created: new Date().toISOString()
+        };
+
+        console.log(searchData);
 
         const doc: RequestParams.Index = {
             index: indexName,
@@ -29,7 +35,7 @@ export class SearchService {
         await this.elasticsearchService.index(doc);
     }
 
-    async search(query: string): Promise<SearchResult[]> {
+    async search(query: string): Promise<SearchResultBase[]> {
         const params: RequestParams.Search = {
             index: indexName,
             body: {
@@ -43,7 +49,7 @@ export class SearchService {
 
         // const result = await this.client.search(params);
         const result = await this.elasticsearchService.search(params);
-        console.log(result.body.hits.hits);
+        //console.log(result.body.hits.hits);
 
         const hits = <any[]>result.body.hits.hits;
         return hits.map((hit) => {
@@ -53,6 +59,7 @@ export class SearchService {
                 score: hit._score,
                 title: hit._source.title,
                 content: hit._source.excerpt,
+                created: hit._source.created,
             };
         });
     }

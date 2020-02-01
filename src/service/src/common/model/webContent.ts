@@ -1,9 +1,8 @@
-import { ShortWebContent } from "./shortWebContent";
+import { ContentBase } from "./contentBase";
 
-export interface WebContent extends ShortWebContent {
+export type WebContent = ContentBase & {
     excerpt: string;
     author: string;
     length: string;
     byline: string;
-    uri: string;
 }

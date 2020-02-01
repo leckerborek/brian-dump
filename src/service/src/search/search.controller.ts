@@ -18,6 +18,7 @@ export class SearchController {
                 content: result.content,
                 score: result.score,
                 origin: result.origin,
+                created: result.created
             };
         });
 

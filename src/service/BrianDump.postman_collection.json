@@ -6,7 +6,7 @@
 	},
 	"item": [
 		{
-			"name": "http://localhost:3000/items",
+			"name": "Query",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -19,7 +19,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"url\": \"https://stackoverflow.com/questions/12742082/nodejs-require-inside-typescript-file\"\n}",
+					"raw": "{\n\t\"query\": \"goose\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -27,46 +27,56 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/items",
+					"raw": "http://localhost:3000/search",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3000",
 					"path": [
-						"items"
+						"search"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "http://localhost:3000/items?query=elasticsearch+docker",
+			"name": "Index",
 			"request": {
-				"method": "GET",
-				"header": [],
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"url\": \"https://goose.game\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "http://localhost:3000/items?query=elasticsearch+docker",
+					"raw": "http://localhost:3000/index",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3000",
 					"path": [
-						"items"
-					],
-					"query": [
-						{
-							"key": "query",
-							"value": "elasticsearch+docker"
-						}
+						"index"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "http://localhost:3000/debug",
+			"name": "Debug",
 			"request": {
 				"method": "GET",
 				"header": [],
