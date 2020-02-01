@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import isUrl from "is-url";
 
 type Result = {
   uid: string;
@@ -9,54 +10,44 @@ type Result = {
 };
 
 const HomePage = () => {
+  const [url, setUrl] = useState("");
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<Result[]>([]);
 
-  useEffect(() => {
-    setResults([
-      {
-        uid: "1",
-        content: "Das ist toll",
-        title:
-          "Autobahn ist eine fantastische Geschichte, nur nicht für die Umwelt.",
-        score: 1,
-        origin: "http://google.de"
-      },
-      {
-        uid: "2",
-        content:
-          "Das ist toll. Aber was passiert wenn ich hier einen super langen text reinschreibe und dich dadurch super nerven will?! Und was passiert wenn das hier noch endlos weitergeht?",
-        title: "Autobahn",
-        score: 1,
-        origin: "http://google.de"
-      },
-      {
-        uid: "3",
-        content: "Das ist toll",
-        title: "Autobahn",
-        score: 1,
-        origin: "http://google.de"
-      },
-      {
-        uid: "4",
-        content: "Das ist toll",
-        title: "Autobahn",
-        score: 1,
-        origin: "http://google.de"
-      },
-      {
-        uid: "5",
-        content: "Das ist toll",
-        title: "Autobahn",
-        score: 1,
-        origin: "http://google.de"
-      }
-    ]);
-  }, [setResults]);
-
-  const handleOnKeyDown = (ev: React.KeyboardEvent) => {
+  const handleUrlKeyDown = (ev: React.KeyboardEvent) => {
     if (ev.key === "Enter") {
-      fetch(`/items?query=${search}`)
+      if (!isUrl(url)) {
+        alert("Not a valid URL. Sorry :(");
+        return;
+      }
+
+      fetch(`/index`, {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          url: url
+        })
+      })
+        .then(() => {
+          setUrl("");
+        })
+        .catch(err => console.error(err));
+    }
+  };
+
+  const handleSearchKeyDown = (ev: React.KeyboardEvent) => {
+    if (ev.key === "Enter") {
+      fetch(`/search`, {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          query: search
+        })
+      })
         .then(res => {
           return res.json();
         })
@@ -70,12 +61,21 @@ const HomePage = () => {
   return (
     <div className="flex flex-col items-center flex-1">
       <input
+        className="w-full p-4 mb-4 text-2xl font-semibold text-gray-800 rounded md:w-1/2 hover:shadow-md focus:outline-none focus:shadow-outline"
+        type="text"
+        value={url}
+        placeholder="Paste URL to index"
+        onChange={ev => setUrl(ev.target.value)}
+        onKeyDown={handleUrlKeyDown}
+      />
+
+      <input
         className="w-full p-4 text-2xl font-semibold text-gray-800 rounded md:w-1/2 hover:shadow-md focus:outline-none focus:shadow-outline"
         type="text"
         value={search}
         placeholder="Search for anything..."
         onChange={ev => setSearch(ev.target.value)}
-        onKeyDown={handleOnKeyDown}
+        onKeyDown={handleSearchKeyDown}
       />
 
       <h2 className="my-4 text-2xl font-bold">Results</h2>
