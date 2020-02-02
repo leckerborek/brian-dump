@@ -75,7 +75,7 @@ const HomePage = () => {
         return;
       }
 
-      fetch(`/index`, {
+      fetch(`/api/index`, {
         method: "post",
         headers: {
           "Content-Type": "application/json"
@@ -93,7 +93,7 @@ const HomePage = () => {
 
   const handleSearchKeyDown = (ev: React.KeyboardEvent) => {
     if (ev.key === "Enter") {
-      fetch(`/search`, {
+      fetch(`/api/search`, {
         method: "post",
         headers: {
           "Content-Type": "application/json"

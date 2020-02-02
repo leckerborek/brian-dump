@@ -4,16 +4,24 @@ services:
     build: src/service/.
     environment:
       - ELASTICSEARCH_NODE=http://elasticsearch:9200
-    ports:
-      - "3000:3000"
+    expose:
+      - 3000
   webclient:
     build: src/webclient/.
-    ports:
-      - "8080:8080"
+    expose:
+      - 80
   elasticsearch:
     image: "elasticsearch:7.5.2"
     environment:
       - "discovery.type=single-node"
+    expose:
+      - 9200
+      - 9300
+  # https://www.domysee.com/blogposts/reverse-proxy-nginx-docker-compose
+  nginx:
+    image: nginx:latest
     ports:
-      - "9200:9200"
-      - "9300:9300"
+      - 80:80
+      - 433:433
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
