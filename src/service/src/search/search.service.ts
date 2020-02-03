@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { Client, ApiResponse, RequestParams } from '@elastic/elasticsearch';
 import { WebContent } from 'src/common/model/webContent';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
@@ -7,8 +7,15 @@ import { Guid } from 'guid-typescript';
 import { SearchModel } from 'src/common/model/searchModel';
 import { SearchResultBase } from 'src/common/model/searchResultBase';
 
+type CreateIndexResponse = {
+    acknowledged: boolean;
+    shards_acknowledged: boolean;
+    index: string
+};
+
 @Injectable()
-export class SearchService {
+export class SearchService implements OnApplicationBootstrap {
+
     constructor(
         private readonly elasticsearchService: ElasticsearchService,
         private readonly configService: ConfigService
@@ -18,10 +25,48 @@ export class SearchService {
     }
 
     private indexName: string;
+    
+    async onApplicationBootstrap(): Promise<void> {
+        await this.prepareIndex();
+    }
 
-    // async create() {
-    //     //this.elasticsearchService.create()
-    // }
+    private async prepareIndex(): Promise<void> 
+    {
+        if (this.configService.get<boolean>('ELASTICSEARCH_DROP_INDEX')) {
+            Logger.warn('Elasticsearch index will be dropped.')
+            const { body: deleteBody } = await this.elasticsearchService.indices.delete({index: this.indexName});
+            Logger.log(deleteBody);
+        }
+
+        const { body: exists, statusCode, headers, warnings, meta } = await this.elasticsearchService.indices.exists({
+            index: this.indexName
+        });
+
+        if (!exists) {
+            Logger.warn('Index does not exist, trying to create one.');
+            const { body, statusCode, headers, warnings } = await this.elasticsearchService.indices.create({
+                index: this.indexName,
+                body: {
+                    mappings: {
+                        properties: {
+                            uid: { type: 'keyword' },
+                            created: { type: 'date' },
+                            origin: {
+                                type: 'text',
+                                fields: {
+                                    raw: {
+                                        type: 'keyword'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            Logger.log(body);
+        }
+    }
 
     async index(content: WebContent) {
         const searchModel: SearchModel = {
@@ -34,7 +79,7 @@ export class SearchService {
         Logger.log(`exists = ${exists}`);
 
         if (exists) {
-            Logger.warn(`Item with origin '${content.origin}' already exists.`)
+            Logger.warn(`Item with origin '${content.origin}' already exists.`);
             return;
         }
 
@@ -78,22 +123,21 @@ export class SearchService {
     }
 
     async exists(origin: string) {
-        return false;
         const params: RequestParams.Search = {
             index: this.indexName,
             body: {
                 query: {
-                    match: {
-                        origin: origin
+                    term: {
+                        'origin.raw': {
+                            value: origin
+                        }
                     }
                 }
             }
         };
 
-        const result = await this.elasticsearchService.search(params);
-        Logger.debug(result);
-        const hits = <any[]>result.body.hits.hits;
-        return hits.length > 0;
+        const { body } = await this.elasticsearchService.count(params);
+        return body.count > 0;
     }
 
     async example() {
