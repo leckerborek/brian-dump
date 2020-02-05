@@ -5,4 +5,11 @@ export type WebContent = ContentBase & {
     author: string;
     length: string;
     byline: string;
+    lang: string;
 }
+
+export type FileContent = ContentBase & {
+    blob: string;
+}
+
+export type Content = WebContent | FileContent;

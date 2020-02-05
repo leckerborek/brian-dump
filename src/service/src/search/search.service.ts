@@ -1,50 +1,46 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
-import { Client, ApiResponse, RequestParams } from '@elastic/elasticsearch';
-import { WebContent } from 'src/common/model/webContent';
+import { ApiResponse, RequestParams } from '@elastic/elasticsearch';
+import { Content } from 'src/common/model/webContent';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { ConfigService } from '@nestjs/config';
 import { Guid } from 'guid-typescript';
 import { SearchModel } from 'src/common/model/searchModel';
 import { SearchResultBase } from 'src/common/model/searchResultBase';
 
-type CreateIndexResponse = {
-    acknowledged: boolean;
-    shards_acknowledged: boolean;
-    index: string
-};
 
 @Injectable()
 export class SearchService implements OnApplicationBootstrap {
-
     constructor(
         private readonly elasticsearchService: ElasticsearchService,
         private readonly configService: ConfigService
     ) {
         this.indexName = configService.get<string>('ELASTICSEARCH_INDEX');
-        Logger.log(`Using ES index '${this.indexName}'`);
     }
 
     private indexName: string;
-    
+
     async onApplicationBootstrap(): Promise<void> {
         await this.prepareIndex();
     }
 
-    private async prepareIndex(): Promise<void> 
-    {
+    private async prepareIndex(): Promise<void> {
+        Logger.log(`Using Elasticsearch index '${this.indexName}'`);
+
         if (this.configService.get<boolean>('ELASTICSEARCH_DROP_INDEX')) {
-            Logger.warn('Elasticsearch index will be dropped.')
-            const { body: deleteBody } = await this.elasticsearchService.indices.delete({index: this.indexName});
+            Logger.warn('Index will be dropped.');
+            const { body: deleteBody } = await this.elasticsearchService.indices.delete({ index: this.indexName });
             Logger.log(deleteBody);
         }
 
-        const { body: exists, statusCode, headers, warnings, meta } = await this.elasticsearchService.indices.exists({
+        const { body: exists } = await this.elasticsearchService.indices.exists({
             index: this.indexName
         });
 
-        if (!exists) {
-            Logger.warn('Index does not exist, trying to create one.');
-            const { body, statusCode, headers, warnings } = await this.elasticsearchService.indices.create({
+        if (exists) {
+            Logger.log('Index already exists.')
+        } else {
+            Logger.warn('Index does not exist, trying to create new.');
+            const { body } = await this.elasticsearchService.indices.create({
                 index: this.indexName,
                 body: {
                     mappings: {
@@ -58,17 +54,17 @@ export class SearchService implements OnApplicationBootstrap {
                                         type: 'keyword'
                                     }
                                 }
-                            }
+                            },
+                            blob: { type: 'binary' }
                         }
                     }
                 }
             });
-
             Logger.log(body);
         }
     }
 
-    async index(content: WebContent) {
+    async index(content: Content) {
         const searchModel: SearchModel = {
             ...content,
             uid: Guid.raw(),

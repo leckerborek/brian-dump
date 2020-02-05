@@ -1,6 +1,6 @@
-import { WebContent } from "./webContent";
+import { Content } from "./webContent";
 
-export type SearchModel = WebContent & {
+export type SearchModel = Content & {
     uid: string;
     created: string;
 }

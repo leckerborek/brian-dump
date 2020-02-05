@@ -1,6 +1,11 @@
 {
   "dependencies": {
     "autoprefixer": "^9.7.4",
-    "postcss-cli": "^7.1.0"
+    "franc": "^5.0.0",
+    "postcss-cli": "^7.1.0",
+    "string-strip-html": "^4.3.16"
+  },
+  "devDependencies": {
+    "@types/string-strip-html": "^4.3.0"
   }
 }
