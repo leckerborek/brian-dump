@@ -33,7 +33,9 @@
     "request": "^2.83.0",
     "request-promise-native": "^1.0.8",
     "rimraf": "^3.0.0",
-    "rxjs": "^6.5.4"
+    "rxjs": "^6.5.4",
+    "franc": "^5.0.0",
+    "string-strip-html": "^4.3.16"
   },
   "devDependencies": {
     "@nestjs/cli": "^6.13.2",
@@ -47,6 +49,7 @@
     "@types/supertest": "^2.0.8",
     "@typescript-eslint/eslint-plugin": "^2.12.0",
     "@typescript-eslint/parser": "^2.12.0",
+    "@types/string-strip-html": "^4.3.0",
     "eslint": "^6.7.2",
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-import": "^2.19.1",
