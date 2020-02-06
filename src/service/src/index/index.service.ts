@@ -3,8 +3,6 @@ import * as request from 'request-promise-native';
 import * as readability from 'readability-node';
 import * as jsdom from 'jsdom';
 import { SearchService } from 'src/search/search.service';
-import * as franc from 'franc';
-// var franc = require('franc')
 
 
 //import * as stipHtml from 'string-strip-html';
@@ -43,8 +41,6 @@ export class IndexService {
             //if (Verbose) Logger.debug('article', article);
 
             const content = stripHtml(article.content);
-            const lang = franc(content);
-            Logger.log(lang);
 
             const webContent = {
                 origin: url,
@@ -54,8 +50,7 @@ export class IndexService {
                 content: content,
                 length: article.length,
                 byline: article.byline,
-                uri: article.uri,
-                lang: lang,
+                uri: article.uri
             };
 
             //if (Verbose) Logger.debug('webContent', webContent);

@@ -1,3 +1,5 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 export class IndexUrlRequestDto {
-    url: string = '';
+    @ApiProperty() url: string;
 }

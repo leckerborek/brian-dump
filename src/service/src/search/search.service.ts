@@ -6,7 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { Guid } from 'guid-typescript';
 import { SearchModel } from 'src/common/model/searchModel';
 import { SearchResultBase } from 'src/common/model/searchResultBase';
-
+import * as franc from 'franc';
 
 @Injectable()
 export class SearchService implements OnApplicationBootstrap {
@@ -37,7 +37,7 @@ export class SearchService implements OnApplicationBootstrap {
         });
 
         if (exists) {
-            Logger.log('Index already exists.')
+            Logger.log('Index already exists.');
         } else {
             Logger.warn('Index does not exist, trying to create new.');
             const { body } = await this.elasticsearchService.indices.create({
@@ -47,6 +47,7 @@ export class SearchService implements OnApplicationBootstrap {
                         properties: {
                             uid: { type: 'keyword' },
                             created: { type: 'date' },
+                            lang: { type: 'keyword' },
                             origin: {
                                 type: 'text',
                                 fields: {
@@ -55,7 +56,8 @@ export class SearchService implements OnApplicationBootstrap {
                                     }
                                 }
                             },
-                            blob: { type: 'binary' }
+                            blob: { type: 'binary' },
+                            content: { type: 'text' }
                         }
                     }
                 }
@@ -65,21 +67,22 @@ export class SearchService implements OnApplicationBootstrap {
     }
 
     async index(content: Content) {
-        const searchModel: SearchModel = {
-            ...content,
-            uid: Guid.raw(),
-            created: new Date().toISOString()
-        };
-
-        const exists = await this.exists(content.origin);
-        Logger.log(`exists = ${exists}`);
-
+        const exists: boolean = (content.origin) ? await this.exists(content.origin) : false;
         if (exists) {
             Logger.warn(`Item with origin '${content.origin}' already exists.`);
             return;
         }
 
-        Logger.debug(searchModel);
+        const meta = {
+            uid: Guid.raw(),
+            lang: franc(content.content),
+            created: new Date().toISOString()
+        };
+
+        const searchModel: SearchModel = {
+            ...content,
+            ...meta
+        };
 
         const document: RequestParams.Index = {
             index: this.indexName,
@@ -134,60 +137,5 @@ export class SearchService implements OnApplicationBootstrap {
 
         const { body } = await this.elasticsearchService.count(params);
         return body.count > 0;
-    }
-
-    async example() {
-        // Let's start by indexing some data
-        const doc1: RequestParams.Index = {
-            index: 'game-of-thrones',
-            body: {
-                character: 'Ned Stark',
-                quote: 'Winter is coming.'
-            }
-        };
-        await this.elasticsearchService.index(doc1);
-
-        const doc2: RequestParams.Index = {
-            index: 'game-of-thrones',
-            body: {
-                character: 'Daenerys Targaryen',
-                quote: 'I am the blood of the dragon.'
-            }
-        };
-        await this.elasticsearchService.index(doc2);
-
-        const doc3: RequestParams.Index = {
-            index: 'game-of-thrones',
-            // here we are forcing an index refresh,
-            // otherwise we will not get any result
-            // in the consequent search
-            refresh: 'true',
-            body: {
-                character: 'Tyrion Lannister',
-                quote: 'A mind needs books like a sword needs a whetstone.'
-            }
-        };
-        await this.elasticsearchService.index(doc3);
-
-        // Let's search!
-        const params: RequestParams.Search = {
-            index: 'game-of-thrones',
-            body: {
-                query: {
-                    match: {
-                        quote: 'winter'
-                    }
-                }
-            }
-        };
-
-        this.elasticsearchService
-            .search(params)
-            .then((result: ApiResponse) => {
-                Logger.log(result.body.hits.hits);
-            })
-            .catch((err: Error) => {
-                Logger.error(err);
-            });
     }
 }

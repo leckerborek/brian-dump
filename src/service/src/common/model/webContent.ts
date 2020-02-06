@@ -10,6 +10,12 @@ export type WebContent = ContentBase & {
 
 export type FileContent = ContentBase & {
     blob: string;
+    mimeType: string;
+    originalname: string;
 }
 
-export type Content = WebContent | FileContent;
+export type CustomContent = ContentBase & {
+    // content content?!
+}
+
+export type Content = WebContent | FileContent | CustomContent;
