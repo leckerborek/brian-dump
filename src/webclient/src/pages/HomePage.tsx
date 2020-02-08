@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import isUrl from "is-url";
-import FlipMove from "react-flip-move";
 import SortButton from "../components/SortButton";
+import moment from "moment";
 
 type Result = {
   uid: string;
@@ -28,6 +28,8 @@ const HomePage = () => {
   });
 
   const sortResults = useCallback(() => {
+    //if (!results) return;
+
     setSortedResults(
       results.sort((a, b) => {
         if (toggled.date) {
@@ -149,29 +151,28 @@ const HomePage = () => {
           Score
         </SortButton>
       </div>
-      <FlipMove className="flex flex-wrap justify-center">
-        {sortedResults.length === 0 ? (
-          <p>Search for something</p>
-        ) : (
-          sortedResults.map(result => (
-            <a
-              href={result.origin}
-              target="_blank"
-              rel="noopener noreferrer"
-              key={result.uid}
-              className="flex flex-col content-between w-64 h-48 p-8 m-4 bg-white rounded hover:shadow-md"
-            >
-              <p className="font-bold truncate">{result.title}</p>
-              <p className="flex-1 h-12 overflow-hidden text-sm">
-                {result.content}
-              </p>
-              <p className="self-end mt-2 text-xs text-gray-500">
-                Score: {result.score}
-              </p>
-            </a>
-          ))
-        )}
-      </FlipMove>
+      {sortedResults.length === 0 ? (
+        <p>Search for something</p>
+      ) : (
+        sortedResults.map(result => (
+          <a
+            href={result.origin}
+            target="_blank"
+            rel="noopener noreferrer"
+            key={result.uid}
+            className="flex flex-col content-between w-64 h-48 p-8 m-4 bg-white rounded hover:shadow-md"
+          >
+            <p className="text-sm text-gray-500">
+              {moment(result.created).fromNow()}
+            </p>
+            <p className="font-bold truncate">{result.title}</p>
+            <p className="flex-1 h-12 overflow-hidden overflow-y-scroll text-sm">
+              {result.content}
+            </p>
+            <p className="mt-2 text-xs text-gray-500">Score: {result.score}</p>
+          </a>
+        ))
+      )}
     </div>
   );
 };
