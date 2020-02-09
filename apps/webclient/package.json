@@ -5,6 +5,7 @@
   "private": true,
   "dependencies": {
     "autoprefixer": "^9.7.4",
+    "brian-dump-shared": "^0.1.0",
     "is-url": "^1.2.4",
     "moment": "^2.24.0",
     "postcss-cli": "^7.1.0",
@@ -17,6 +18,7 @@
   },
   "proxy": "http://localhost:3000",
   "scripts": {
+    "lerna:dev": "npm run start",
     "build:style": "tailwind build src/styles/index.css -o src/styles/tailwind.css",
     "start": "npm run build:style && PORT=3001 react-scripts start",
     "build": "react-scripts build",

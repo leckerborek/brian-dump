@@ -1,6 +1,9 @@
 {
-  "name": "root",
+  "name": "brian-dump",
   "private": true,
+  "scripts": {
+    "start:dev": "lerna run lerna:dev --parallel"
+  },
   "devDependencies": {
     "lerna": "^3.20.2"
   }

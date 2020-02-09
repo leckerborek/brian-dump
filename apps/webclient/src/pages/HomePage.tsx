@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import isUrl from "is-url";
 import SortButton from "../components/SortButton";
 import moment from "moment";
+import { SearchRequest } from "brian-dump-shared/model/";
 
 type Result = {
   uid: string;
@@ -15,6 +16,10 @@ type Result = {
 export type Toggled = {
   date: boolean;
   score: boolean;
+};
+
+const test: SearchRequest = {
+  query: "this is just a test"
 };
 
 const HomePage = () => {
