@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { ApiResponse, RequestParams } from '@elastic/elasticsearch';
-import { Content } from 'src/common/model/webContent';
+import { Content, FileContent } from 'src/common/model/webContent';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { ConfigService } from '@nestjs/config';
 import { Guid } from 'guid-typescript';
@@ -17,6 +17,7 @@ export class SearchService implements OnApplicationBootstrap {
         this.indexName = configService.get<string>('ELASTICSEARCH_INDEX');
     }
 
+    private readonly ingestPipelineName: string = 'document-pipeline';
     private indexName: string;
 
     async onApplicationBootstrap(): Promise<void> {
@@ -63,11 +64,29 @@ export class SearchService implements OnApplicationBootstrap {
                 }
             });
             Logger.log(body);
+
+            const { body: ingestBody } = await this.elasticsearchService.ingest.put_pipeline({
+                id: this.ingestPipelineName,
+                body: {
+                    processors: [
+                        {
+                            attachment: {
+                                field: 'blob'
+                            }
+                        }
+                    ]
+                }
+            });
+            Logger.log(ingestBody);
         }
     }
 
+    isFileContent(content: any): content is FileContent {
+        return content.blob !== undefined;
+    }
+
     async index(content: Content) {
-        const exists: boolean = (content.origin) ? await this.exists(content.origin) : false;
+        const exists: boolean = content.origin ? await this.exists(content.origin) : false;
         if (exists) {
             Logger.warn(`Item with origin '${content.origin}' already exists.`);
             return;
@@ -84,10 +103,17 @@ export class SearchService implements OnApplicationBootstrap {
             ...meta
         };
 
-        const document: RequestParams.Index = {
+        let document: RequestParams.Index = {
             index: this.indexName,
             body: searchModel
         };
+
+        if (this.isFileContent(content)) {
+            document = {
+                ...document,
+                pipeline: this.ingestPipelineName
+            };
+        }
 
         await this.elasticsearchService.index(document);
     }

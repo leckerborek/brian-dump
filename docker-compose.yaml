@@ -11,9 +11,10 @@ services:
     expose:
       - 80
   elasticsearch:
-    image: "elasticsearch:7.5.2"
-    environment:
-      - "discovery.type=single-node"
+    build: src/elasticsearch/.
+    # image: "elasticsearch:7.5.2"
+    # environment:
+    #   - "discovery.type=single-node"
     expose:
       - 9200
       - 9300
