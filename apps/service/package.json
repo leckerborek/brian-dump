@@ -1,6 +1,6 @@
 {
-  "name": "nest-test",
-  "version": "0.0.1",
+  "name": "brian-dump-service",
+  "version": "0.1.0",
   "license": "MIT",
   "scripts": {
     "lerna:dev": "npm run start:dev",
