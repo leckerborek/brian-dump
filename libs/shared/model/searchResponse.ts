@@ -1,5 +1,5 @@
-export class SearchResponse {
-    score: number;
-    title: string;
-    content: string;
+export interface SearchResponse {
+  score: number;
+  title: string;
+  content: string;
 }

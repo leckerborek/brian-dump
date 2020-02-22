@@ -2,8 +2,13 @@
   "name": "brian-dump",
   "private": true,
   "scripts": {
-    "start:dev": "lerna run lerna:dev --parallel"
+    "start:dev": "lerna run lerna:dev --parallel",
+    "bootstrap": "lerna bootstrap --use-workspaces"
   },
+  "workspaces": [
+    "apps/*",
+    "libs/*"
+  ],
   "devDependencies": {
     "lerna": "^3.20.2"
   }

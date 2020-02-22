@@ -8,6 +8,12 @@ Doku: https://github.com/lerna/lerna/blob/master/README.md (hint: click on the l
 
 ### Prerequisites
 
+You have to use `yarn` for package resolution and running the project.
+
+```
+$ npm i -g yarn
+```
+
 Have a docker container of elastic search running:
 
 ```
@@ -17,7 +23,8 @@ $ docker run -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker
 ### Development
 
 ```
-$ npm run start:dev
+$ yarn bootstrap
+$ yarn start:dev
 ```
 
 ## Add a new package

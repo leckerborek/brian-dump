@@ -10,7 +10,7 @@ const App = () => {
     <Router>
       <div className="container mx-auto">
         <nav className="flex flex-row items-center p-4 my-4 font-mono font-bold bg-white rounded">
-          <svg className="mr-4" width="48" viewBox="0 0 490 490">
+          {/* <svg className="mr-4" width="48" viewBox="0 0 490 490">
             <g>
               <path
                 d="M470.025,244.991c12.987-16.198,18.582-37.435,14.796-58.317c-3.962-21.851-17.372-40.168-36.264-50.546
@@ -55,7 +55,7 @@ const App = () => {
 			c10.086-10.085,16.822-22.623,19.678-36.265h69.75C453.205,269.816,457.832,284.012,455.311,297.945z"
               />
             </g>
-          </svg>
+          </svg> */}
           <PageLink name="Home" to="/" />
           <PageLink name="About" to="/about" />
         </nav>

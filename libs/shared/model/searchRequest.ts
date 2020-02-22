@@ -1,3 +1,3 @@
-export class SearchRequest {
-    query: string
+export interface SearchRequest {
+  query: string;
 }
