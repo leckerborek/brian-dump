@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import isUrl from "is-url";
 import SortButton from "../components/SortButton";
 import moment from "moment";
+import { SearchRequest } from "brian-dump-shared/model/";
 
 type Result = {
   uid: string;
@@ -15,6 +16,10 @@ type Result = {
 export type Toggled = {
   date: boolean;
   score: boolean;
+};
+
+const test: SearchRequest = {
+  query: "this is just a test"
 };
 
 const HomePage = () => {
@@ -124,7 +129,6 @@ const HomePage = () => {
         onChange={ev => setUrl(ev.target.value)}
         onKeyDown={handleUrlKeyDown}
       />
-
       <input
         className="w-full p-4 text-2xl font-semibold text-gray-800 rounded md:w-1/2 hover:shadow-md focus:outline-none focus:shadow-outline"
         type="text"
@@ -133,7 +137,6 @@ const HomePage = () => {
         onChange={ev => setSearch(ev.target.value)}
         onKeyDown={handleSearchKeyDown}
       />
-
       <h2 className="mt-4 text-2xl font-bold">Results</h2>
       <div className="flex mt-2 mb-2">
         <SortButton

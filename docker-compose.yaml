@@ -1,13 +1,13 @@
 version: "3"
 services:
   service:
-    build: src/service/.
+    build: apps/service/.
     environment:
       - ELASTICSEARCH_NODE=http://elasticsearch:9200
     expose:
       - 3000
   webclient:
-    build: src/webclient/.
+    build: apps/webclient/.
     expose:
       - 80
   elasticsearch:
