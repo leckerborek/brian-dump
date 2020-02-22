@@ -1,5 +1,9 @@
 import React from "react";
-import { Toggled } from "../pages/HomePage";
+
+export type Toggled = {
+  date: boolean;
+  score: boolean;
+};
 
 interface Props extends React.Props<React.ElementType> {
   handleToggledClicked: (button: string) => void;

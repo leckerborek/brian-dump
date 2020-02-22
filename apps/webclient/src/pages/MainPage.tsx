@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import isUrl from "is-url";
-import SortButton from "../components/SortButton";
+import SortButton, { Toggled } from "../components/SortButton";
 import moment from "moment";
 import { SearchRequest } from "brian-dump-shared/model/";
 
@@ -13,16 +13,11 @@ type Result = {
   created: string;
 };
 
-export type Toggled = {
-  date: boolean;
-  score: boolean;
-};
-
 const test: SearchRequest = {
   query: "this is just a test"
 };
 
-const HomePage = () => {
+const MainPage = () => {
   const [url, setUrl] = useState("");
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<Result[]>([]);
@@ -180,4 +175,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default MainPage;
